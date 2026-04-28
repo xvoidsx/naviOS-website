@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,7 +158,11 @@
           <br>• Click <i>Date</i> (Super+C shortcut) for <b>gsimplecal</b>.
         </p>
         <p><b>volume</b>: Scroll over icon to adjust. Left-click to mute.</p>
-        <p><b>idle inhibitor (👁)</b>: Toggle to prevent screen timeout during long reads or compiles.</p>
+	<p><b>networks</b>: Click to open <code>nmtui</code> and configure your internet.</p>
+	<p><b>brightness</b>: Scroll this module to control the brightness.</p>
+        <p><b>idle inhibitor (👁)</b>: Toggle to prevent screen timeout during long reads or compiles, or when watching videos.</p>
+	<p><b>power states</b>: Click this to choose whether to use Performance, Power Saver, or Balanced power states.</p>
+	<p><b>power menu</b>: Click to choose whether to Suspend, Hibernate, Shutdown, or Reboot your machine.</p>
       </div>
 
       <div id="tab-apps" class="tab-content">
@@ -178,8 +183,8 @@
 
   <div id="modalSync" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalSync')">[X]</span><h2 style="color:#ff10f0">Synchronize</h2><p>Ready to enter the wired?</p><p>Prepare your installation media - naviOS v1.2 "<b>mika</b>" is ready for deployment - grab your image below and flash it to your machine to get your <b>navi</b> up and running.</p><a href="#" class="cta">Download ISO</a></div></div>
   <div id="modalSource" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalSource')">[X]</span><h2 style="color:#ff10f0">Source Code</h2><p>Everything is open. Everything is yours.</p><p>We invite you to check out the source code, contribute pull requests, or fork it and do whatever you want with it.</p><p>It's your operating system!</p><a href="https://github.com/xvoidsx/navios" target="_blank" class="cta">GitHub Repository</a></div></div>
-  <div id="modalProto" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalProto')">[X]</span><h2 style="color:#ff10f0">Protocol Specs</h2><p>Integrated apps for engaging with the decentralized Web.</p><ul><li><b>neighborli:</b> Our Mastodon fork built on the Fediverse.</li><li><b>glyyph:</b> Our from-scratch Nostr client and relay system.</li></ul></div></div>
-
+  <div id="modalProto" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalProto')">[X]</span><h2 style="color:#ff10f0">Protocol Specs</h2><p>Integrated apps for engaging with the decentralized Web.</p><ul><li><b>neighborli:</b> Our Mastodon fork built on the Fediverse.</li><li><b>glyyph:</b> Our from-scratch Nostr client and relay system.</li><li><b>nebula:</b> Our fork of the <b>amfora</b> gemini browser.</li><li><b>tor browser:</b> From the Tor Project - access <b>onion sites</b>.</li></ul></div></div>
+i
   <header>
     <h1 style="color:#ff10f0">naviOS</h1>
     <p>no matter where you go, everyone's connected</p>
@@ -187,18 +192,18 @@
 
   <section class="hero">
     <div class="card">
-      <h2>Smallweb Native</h2>
-      <p>A return to the handcrafted web. Optimized for the indie web and alternative protocols like Tor and Gemini.</p>
+      <h2>Enter the Wired</h2>
+      <p>Time to sync with the Wired. Grab your <b>naviOS</b> image here to install it on your own machine. Ready to liberate your computing experience?</p>
       <button onclick="openModal('modalSync')" class="cta">Synchronize</button>
     </div>
     <div class="card">
-      <h2>Built on the Best</h2>
-      <p>Built on the foundation of Debian Testing. Timely updates rolling out to keep you up-to-date.</p>
+      <h2>Free and Open-Source</h2>
+      <p>Every single line of code in naviOS is free and open-source software. We either build on top of existing software by forking and modifying it, or create new things from scratch. You don't have to trust us - all the code is here.</p>
       <button onclick="openModal('modalSource')" class="cta">Source Code</button>
     </div>
     <div class="card">
-      <h2>Federated Social</h2>
-      <p>Native integration for the Fediverse and Nostr. Decentralized by design.</p>
+      <h2>Smallweb Native, Federated First</h2>
+      <p>Native integration for the Fediverse and Nostr. Optimized for the indie web and alternative protocols like Gemini and Tor. Decentralized by design.</p>
       <button onclick="openModal('modalProto')" class="cta">Protocol Specs</button>
     </div>
     <div class="card">
