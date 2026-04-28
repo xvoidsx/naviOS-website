@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>naviOS | Enter the Wired</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'JetBrains Mono', monospace;
+      background: #050505;
+      color: #fff;
+      position: relative;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    canvas#matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.8;
+    }
+    header {
+      text-align: center;
+      padding: 6rem 1rem 4rem;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #ff10f0;
+    }
+    header h1 { font-size: 4rem; font-weight: 700; margin: 0; text-transform: lowercase; letter-spacing: -3px; }
+    header p { font-size: 1.2rem; color: #39ff14; margin-top: 1rem; }
+
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .card { background: rgba(10, 10, 10, 0.9); border: 1px solid rgba(0, 255, 200, 0.3); border-radius: 0.5rem; padding: 2.5rem; transition: all 0.4s ease; backdrop-filter: blur(12px); display: flex; flex-direction: column; }
+    .card:hover { border-color: #ff10f0; box-shadow: 0 0 30px rgba(255, 16, 240, 0.2); transform: translateY(-5px); }
+    .card h2 { font-size: 1.6rem; margin: 0 0 1rem; color: #00ffff; }
+    .card p { font-size: 0.95rem; color: #aaa; flex-grow: 1; }
+    
+    .cta { margin-top: 2rem; display: inline-block; border: 1px solid #39ff14; color: #39ff14; font-weight: 600; padding: 0.8rem 1.5rem; text-decoration: none; transition: all 0.2s ease; text-transform: uppercase; font-size: 0.85rem; text-align: center; cursor: pointer; background: transparent; font-family: inherit; }
+    .cta:hover { background: #39ff14; color: #000; box-shadow: 0 0 15px #39ff14; }
+
+    /* styling for modals */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+    .modal-content { background: #050505; border: 1px solid #39ff14; max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 3rem; position: relative; box-shadow: 0 0 60px rgba(57, 255, 20, 0.15); }
+    .close-modal { position: sticky; top: 0; float: right; color: #ff3131; cursor: pointer; font-size: 0.8rem; z-index: 20; background: #050505; padding: 10px; border: 1px solid #ff3131; }
+
+    /* styling for tabs */
+    .modal-tabs { display: flex; gap: 15px; border-bottom: 1px solid #222; margin-bottom: 25px; position: sticky; top: 0; background: #050505; z-index: 10; padding-bottom: 10px; }
+    .tab-btn { background: none; border: 1px solid #444; color: #888; font-family: inherit; padding: 10px 20px; cursor: pointer; text-transform: lowercase; }
+    .tab-btn.active { color: #39ff14; border-color: #39ff14; background: rgba(57, 255, 20, 0.05); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .help-sub { color: #ff10f0; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid #222; padding-bottom: 5px; text-transform: lowercase; font-size: 1.1rem; }
+    .key-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px 20px; margin-bottom: 2rem; font-size: 0.9rem; }
+    .key-grid div:nth-child(odd) { color: #00ffff; font-weight: 600; }
+    .key-grid div:nth-child(even) { color: #ccc; border-bottom: 1px dotted #222; }
+
+    /* styling for different sections */
+    .carousel-section { max-width: 1100px; margin: 4rem auto; padding: 0 2rem; text-align: center; }
+    .carousel-container { position: relative; overflow: hidden; border: 1px solid rgba(255, 16, 240, 0.4); border-radius: 0.5rem; background: #000; }
+    .carousel-track { display: flex; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+    .carousel-slide { min-width: 100%; position: relative; }
+    .carousel-slide img { width: 100%; height: auto; display: block; }
+    .carousel-caption { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.85); color: #39ff14; padding: 1.5rem; font-size: 0.9rem; text-align: left; border-top: 1px solid #ff10f0; }
+    .carousel-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.7); color: #ff10f0; border: 1px solid #ff10f0; padding: 1.2rem; cursor: pointer; z-index: 10; }
+    .carousel-button.prev { left: 1rem; } .carousel-button.next { right: 1rem; }
+
+    .info-block { max-width: 900px; margin: 4rem auto; padding: 3rem; background: rgba(5, 5, 5, 0.9); border-left: 4px solid #39ff14; border-right: 4px solid #ff10f0; }
+    .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; list-style: none; padding: 0; }
+    .app-grid li { background: rgba(20, 20, 20, 0.6); padding: 15px; border: 1px solid #222; font-size: 0.9rem; }
+    .app-grid b { color: #00ffff; display: block; margin-bottom: 5px; }
+
+    .footer-note { text-align: center; padding: 5rem 2rem 2rem; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 5px; font-weight: 700; background: linear-gradient(90deg, #ff10f0, #39ff14, #00ffff, #ff10f0); background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: breathe 8s ease-in-out infinite; }
+    @keyframes breathe { 0%, 100% { background-position: 0% 50%; transform: scale(1); } 50% { background-position: 100% 50%; transform: scale(1.05); } }
+    .credit-line { color: #444; text-align: center; padding-bottom: 4rem; font-size: 0.8rem; }
+    @media (max-width: 800px) { .hero, .app-grid, .key-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div id="modalDocs" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('modalDocs')">[DISCONNECT_SESSION]</span>
+      
+      <div class="modal-tabs">
+        <button class="tab-btn active" onclick="showTab(event, 'tab-keys')">01_keybindings</button>
+        <button class="tab-btn" onclick="showTab(event, 'tab-quick')">02_interface_guide</button>
+        <button class="tab-btn" onclick="showTab(event, 'tab-apps')">03_software_manifest</button>
+      </div>
+
+      <div id="tab-keys" class="tab-content active">
+        <p style="color: #39ff14; font-size: 0.8rem; margin-bottom: 20px;">// Note: Super = Windows/Command key.</p>
+        
+        <h3 class="help-sub">> opening_applications</h3>
+        <div class="key-grid">
+          <div>Super + Enter</div><div>Open a terminal window</div>
+          <div>Super + Tab</div><div>Open "Nightshade Menu" (App Launcher)</div>
+          <div>Super + D</div><div>Open "Nightshade Command Bar" (Runner)</div>
+          <div>Super + Shift + A</div><div>Open "Nightshade App List"</div>
+          <div>Alt + B</div><div>Open Web Browser</div>
+          <div>Super + Shift + F</div><div>Open File Manager</div>
+          <div>Alt + H</div><div>Open htop (Resource Usage)</div>
+          <div>Alt + C</div><div>Open calcurse (Calendar/Todo)</div>
+          <div>Super + C</div><div>Open gsimplecal (GTK Calendar)</div>
+        </div>
+
+        <h3 class="help-sub">> window_management</h3>
+        <div class="key-grid">
+          <div>Super + Shift + Q</div><div>Close focused window</div>
+          <div>Super + Arrow Keys</div><div>Switch focus between windows</div>
+          <div>Super + Shift + Arrows</div><div>Swap window placement on grid</div>
+          <div>Super + F</div><div>Toggle Fullscreen mode</div>
+          <div>Super + Shift + Space</div><div>Toggle Floating mode (re-tile to exit)</div>
+          <div>Super + Space</div><div>Switch focus between Tiled/Floating windows</div>
+          <div>Super + W</div><div>Switch to Tabbed mode</div>
+          <div>Super + S</div><div>Switch to Stacked mode</div>
+          <div>Super + E</div><div>Switch to Tiled mode</div>
+          <div>Super + H</div><div>Tile next window Horizontally</div>
+          <div>Super + V</div><div>Tile next window Vertically</div>
+          <div>Super + R</div><div>Enter Resize mode (Arrow keys to scale)</div>
+        </div>
+
+        <h3 class="help-sub">> workspaces</h3>
+        <div class="key-grid">
+          <div>Super + [Number]</div><div>Move to corresponding workspace</div>
+          <div>Super + Shift + [Number]</div><div>Send focused window to workspace</div>
+        </div>
+
+        <h3 class="help-sub">> system_operations</h3>
+        <div class="key-grid">
+          <div>Super + Shift + N</div><div>Pop out recent notifications</div>
+          <div>Super + P</div><div>Take screenshot (Copies to clipboard + ~/Pictures)</div>
+          <div>Super + Shift + Z</div><div>Lock Screen</div>
+          <div>Super + Shift + R</div><div>Restart wiredWM in-place</div>
+          <div>Super + Shift + E</div><div>Log out of wired</div>
+          <div>Super + Shift + H</div><div>Launch the navi help manual</div>
+        </div>
+
+        <p style="margin-top: 2rem; font-size: 0.8rem; border: 1px solid #222; padding: 10px; color: #888;">
+          CONFIG_PATH: <span style="color:#00ffff;">$HOME/.config/sway/config</span>
+        </p>
+      </div>
+
+      <div id="tab-quick" class="tab-content">
+        <h3 class="help-sub">> the_top_panel (waybar)</h3>
+        <p><b>wired launcher (Δ)</b>: Click for the Nightshade Menu.</p>
+        <p><b>workspaces</b>: Click numbers to jump. Hover to see window counts.</p>
+        <p><b>time and date</b>: 
+          <br>• Click <i>Day</i> (Alt+C shortcut) for <b>calcurse</b>. 
+          <br>• Click <i>Time</i> for <b>tty-clock</b>. 
+          <br>• Click <i>Date</i> (Super+C shortcut) for <b>gsimplecal</b>.
+        </p>
+        <p><b>volume</b>: Scroll over icon to adjust. Left-click to mute.</p>
+        <p><b>idle inhibitor (👁)</b>: Toggle to prevent screen timeout during long reads or compiles.</p>
+      </div>
+
+      <div id="tab-apps" class="tab-content">
+        <h3 class="help-sub">> pre_installed_suite</h3>
+        <div class="app-grid">
+          <li><b>Terminals</b>alacritty, kitty</li>
+          <li><b>Browsers</b>firefox, brave, chromium, tor browser, nebula, lynx</li>
+          <li><b>File Management</b>nemo (gui), nnn (tui)</li>
+          <li><b>Dev Tools</b>vim, zed, codium, sublime text, sublime merge</li>
+          <li><b>Office</b>libreoffice suite, typora</li>
+          <li><b>Nightshade Apps</b>fossfit, neighborli, glyyph</li>
+          <li><b>Media</b>mpv, cmus, cliamp, rhythmbox</li>
+          <li><b>Gaming</b>steam, retroArch.</li>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSync" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalSync')">[X]</span><h2 style="color:#ff10f0">Synchronize</h2><p>Ready to enter the wired?</p><p>Prepare your installation media - naviOS v1.2 "<b>mika</b>" is ready for deployment - grab your image below and flash it to your machine to get your <b>navi</b> up and running.</p><a href="#" class="cta">Download ISO</a></div></div>
+  <div id="modalSource" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalSource')">[X]</span><h2 style="color:#ff10f0">Source Code</h2><p>Everything is open. Everything is yours.</p><p>We invite you to check out the source code, contribute pull requests, or fork it and do whatever you want with it.</p><p>It's your operating system!</p><a href="https://github.com/xvoidsx/navios" target="_blank" class="cta">GitHub Repository</a></div></div>
+  <div id="modalProto" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalProto')">[X]</span><h2 style="color:#ff10f0">Protocol Specs</h2><p>Integrated apps for engaging with the decentralized Web.</p><ul><li><b>neighborli:</b> Our Mastodon fork built on the Fediverse.</li><li><b>glyyph:</b> Our from-scratch Nostr client and relay system.</li></ul></div></div>
+
+  <header>
+    <h1 style="color:#ff10f0">naviOS</h1>
+    <p>no matter where you go, everyone's connected</p>
+  </header>
+
+  <section class="hero">
+    <div class="card">
+      <h2>Smallweb Native</h2>
+      <p>A return to the handcrafted web. Optimized for the indie web and alternative protocols like Tor and Gemini.</p>
+      <button onclick="openModal('modalSync')" class="cta">Synchronize</button>
+    </div>
+    <div class="card">
+      <h2>Built on the Best</h2>
+      <p>Built on the foundation of Debian Testing. Timely updates rolling out to keep you up-to-date.</p>
+      <button onclick="openModal('modalSource')" class="cta">Source Code</button>
+    </div>
+    <div class="card">
+      <h2>Federated Social</h2>
+      <p>Native integration for the Fediverse and Nostr. Decentralized by design.</p>
+      <button onclick="openModal('modalProto')" class="cta">Protocol Specs</button>
+    </div>
+    <div class="card">
+      <h2>Documentation</h2>
+      <p>The Master Manual for naviOS. Learn the keybindings and system architecture.</p>
+      <button onclick="openModal('modalDocs')" class="cta">Enter the Manual</button>
+    </div>
+  </section>
+
+  <section class="carousel-section">
+    <h3 style="color:#39ff14; margin-bottom:20px;">Visions of the Wired</h3>
+    <div class="carousel-container">
+      <button class="carousel-button prev">&lt;</button>
+      <button class="carousel-button next">&gt;</button>
+      <div class="carousel-track">
+        <div class="carousel-slide"><img src="naviOS1.png" alt="Desktop"><div class="carousel-caption">> wiredWM: keyboard-driven grid arrangement.</div></div>
+        <div class="carousel-slide"><img src="naviOS2.png" alt="Nebula"><div class="carousel-caption">> Nebula: Browsing the Geminispace.</div></div>
+        <div class="carousel-slide"><img src="naviOS3.png" alt="FOSSfit"><div class="carousel-caption">> FOSSfit: Local-first health and logs.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="info-block">
+    <h3 style="color:#ff10f0">Welcome to the Wired ~</h3>
+    <p><b>navi</b> is a minimal distribution built upon Debian Testing, featuring our <b>wired</b> tiling window management setup. Inspired by the <i>Serial Experiments Lain</i> aesthetic, it is designed to be a personal portal into the decentralized Web.</p>
+    <p><b>naviOS</b> is a love letter to the retro age of computing, to free and open-source software, and to the uniqueness of Linux. It embraces a minimal, tiling-first and terminal-centric way of computing, with your operating system flying underneath your fingers as you navigate using your keybindings.</p>
+    <p>The operating system teems with life, as if it were receiving signals from the Wired itself. The panel breathes as if it were an RGB keyboard, cycling through the colors of the <b>nightshadeNeon</b> theme. Beautiful, lo-fi, animated wallpapers glow behind your terminals. <b>naviOS</b> is not only functional, but also beautiful, with an aesthetic quite unmatched by any other operating system.</p>
+    <p>Whether you're programming on the smallweb, gaming, streaming, producing music, creating art, writing, or anything else, <b>naviOS</b> is designed to get out of your way and provide you a gorgeous, intuitive space in which to work and play. Once you've gotten used to the <b>navi way</b> of doing things, you'll find it hard to use other environments again!</p>
+    <p>Welcome to the Wired, friend. We're glad you're here.</p>
+    <h5 style="color:#ff10f0">present day, present time...</h5>
+  </section>
+
+  <div class="footer-note">Let's all love Lain</div>
+  <div class="credit-line">built with ❤️ by <b>xvoidsx</b></div>
+
+  <script>
+    // 'matrix-rain' background
+    // gives the page a 'cmatrix'-like feel
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight; canvas.width = window.innerWidth;
+    const chars = 'アァイィウヴエェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789';
+    const drops = Array(Math.floor(canvas.width / 16)).fill(1);
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '16px monospace';
+      drops.forEach((y, i) => {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillStyle = ['#39ff14', '#ff10f0', '#00ffff'][Math.floor(Math.random() * 3)];
+        ctx.fillText(text, i * 16, y * 16);
+        if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+    }
+    setInterval(drawMatrix, 50);
+
+    // modals/tabs logic
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function showTab(e, id) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      e.currentTarget.classList.add('active');
+    }
+
+    // image carousel logic
+    const track = document.querySelector('.carousel-track');
+    const slides = Array.from(track.children);
+    let idx = 0;
+    document.querySelector('.next').onclick = () => { idx = (idx + 1) % slides.length; track.style.transform = `translateX(-${idx * 100}%)`; };
+    document.querySelector('.prev').onclick = () => { idx = (idx - 1 + slides.length) % slides.length; track.style.transform = `translateX(-${idx * 100}%)`; };
+  </script>
+</body>
+</html>
